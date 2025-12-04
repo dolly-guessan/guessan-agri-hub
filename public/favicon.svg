@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d5a3d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4a7c59;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Soil/ground -->
+  <ellipse cx="50" cy="85" rx="35" ry="10" fill="#5d4037"/>
+  <!-- Plant stem -->
+  <path d="M50 85 Q50 60 50 45" stroke="#4a7c59" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Left leaf -->
+  <path d="M50 55 Q30 45 25 25 Q35 35 50 55" fill="url(#leafGrad)"/>
+  <!-- Right leaf -->
+  <path d="M50 50 Q70 40 75 20 Q65 30 50 50" fill="url(#leafGrad)"/>
+  <!-- Center small leaf -->
+  <path d="M50 45 Q55 30 50 15 Q45 30 50 45" fill="#5a8f5a"/>
+  <!-- Rice grains decoration -->
+  <ellipse cx="30" cy="75" rx="4" ry="2" fill="#d4a574" transform="rotate(-30 30 75)"/>
+  <ellipse cx="70" cy="75" rx="4" ry="2" fill="#d4a574" transform="rotate(30 70 75)"/>
+  <ellipse cx="50" cy="78" rx="4" ry="2" fill="#d4a574"/>
+</svg>
