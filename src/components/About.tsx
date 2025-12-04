@@ -1,7 +1,10 @@
 import { Heart, Award, Leaf, Users } from "lucide-react";
 import riceField from "@/assets/rice-field.jpg";
+import { useContent } from "@/contexts/ContentContext";
 
 const About = () => {
+  const { content } = useContent();
+
   const values = [
     {
       icon: Heart,
@@ -58,32 +61,24 @@ const About = () => {
               À propos de moi
             </span>
             <h2 className="section-title">
-              Un agriculteur dévoué à{" "}
-              <span className="gradient-text">votre satisfaction</span>
+              {content.aboutTitle.split(" ").slice(0, -2).join(" ")}{" "}
+              <span className="gradient-text">{content.aboutTitle.split(" ").slice(-2).join(" ")}</span>
             </h2>
             <div className="space-y-4 text-muted-foreground mb-8">
               <p>
-                Je suis <strong className="text-foreground">GUESSAN BI DOLI</strong>, agriculteur 
-                passionné basé à Gagnoa, au cœur de la Côte d'Ivoire. Depuis plus de 10 ans, 
-                je cultive avec amour et dévouement du riz local de qualité supérieure, 
-                des légumes frais et divers produits agricoles.
+                {content.aboutText}
               </p>
               <p>
-                Ma mission est simple : vous offrir des produits sains, cultivés selon 
-                les méthodes traditionnelles ivoiriennes, tout en respectant notre belle 
-                terre. Chaque grain de riz, chaque légume que je produis porte la marque 
-                de mon engagement envers la qualité et l'authenticité.
+                {content.aboutText2}
               </p>
               <p>
-                Que vous soyez un particulier ou un professionnel, je suis à votre 
-                disposition pour répondre à vos besoins en produits agricoles frais 
-                et de qualité.
+                {content.aboutText3}
               </p>
             </div>
 
             {/* Values Grid */}
             <div className="grid grid-cols-2 gap-4">
-              {values.map((value, index) => (
+              {values.map((value) => (
                 <div
                   key={value.title}
                   className="p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors duration-300"

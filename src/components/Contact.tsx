@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { Phone, Mail, MapPin, Send, MessageCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useContent } from "@/contexts/ContentContext";
 
 const Contact = () => {
   const { toast } = useToast();
+  const { content } = useContent();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formatPhone = (phone: string) => {
+    if (phone.length === 10) {
+      return `${phone.slice(0, 2)} ${phone.slice(2, 4)} ${phone.slice(4, 6)} ${phone.slice(6, 8)} ${phone.slice(8)}`;
+    }
+    return phone;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,16 +78,16 @@ const Contact = () => {
                 <div>
                   <h4 className="font-semibold text-foreground mb-1">Téléphone</h4>
                   <a
-                    href="tel:+2250500216855"
+                    href={`tel:+225${content.contactPhone1}`}
                     className="block text-muted-foreground hover:text-primary transition-colors"
                   >
-                    05 00 21 68 55
+                    {formatPhone(content.contactPhone1)}
                   </a>
                   <a
-                    href="tel:+2250787677108"
+                    href={`tel:+225${content.contactPhone2}`}
                     className="block text-muted-foreground hover:text-primary transition-colors"
                   >
-                    07 87 67 71 08
+                    {formatPhone(content.contactPhone2)}
                   </a>
                 </div>
               </div>
@@ -91,10 +100,10 @@ const Contact = () => {
                 <div>
                   <h4 className="font-semibold text-foreground mb-1">Email</h4>
                   <a
-                    href="mailto:guessandoli55@gmail.com"
+                    href={`mailto:${content.contactEmail}`}
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
-                    guessandoli55@gmail.com
+                    {content.contactEmail}
                   </a>
                 </div>
               </div>
@@ -106,7 +115,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground mb-1">Localisation</h4>
-                  <p className="text-muted-foreground">Gagnoa, Côte d'Ivoire</p>
+                  <p className="text-muted-foreground">{content.address}</p>
                 </div>
               </div>
 
@@ -134,7 +143,7 @@ const Contact = () => {
                 Pour une réponse plus rapide, contactez-moi directement sur WhatsApp.
               </p>
               <a
-                href="https://wa.me/2250787677108?text=Bonjour%20M.%20GUESSAN,%20je%20vous%20contacte%20depuis%20votre%20site%20web."
+                href={`https://wa.me/${content.whatsappNumber}?text=Bonjour%20M.%20GUESSAN,%20je%20vous%20contacte%20depuis%20votre%20site%20web.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-whatsapp w-full justify-center"
