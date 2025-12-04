@@ -1,7 +1,10 @@
 import { ArrowDown, Phone, MessageCircle } from "lucide-react";
 import heroFarmer from "@/assets/hero-farmer.jpg";
+import { useContent } from "@/contexts/ContentContext";
 
 const Hero = () => {
+  const { content } = useContent();
+
   return (
     <section
       id="accueil"
@@ -34,12 +37,12 @@ const Hero = () => {
 
           {/* Main Title */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-primary-foreground mb-6 animate-fade-up stagger-1">
-            GUESSAN BI DOLI
+            {content.heroTitle}
           </h1>
 
           {/* Subtitle */}
           <p className="text-xl sm:text-2xl md:text-3xl text-primary-foreground/90 mb-4 animate-fade-up stagger-2 font-light">
-            Votre cultivateur de confiance à
+            {content.heroSubtitle.split(" à ")[0]} à
           </p>
           <p className="text-2xl sm:text-3xl md:text-4xl font-heading text-accent mb-8 animate-fade-up stagger-3">
             Gagnoa, Côte d'Ivoire
@@ -47,8 +50,7 @@ const Hero = () => {
 
           {/* Description */}
           <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-12 animate-fade-up stagger-4">
-            Du riz local de qualité supérieure et des légumes frais cultivés avec passion, 
-            directement de mes champs à votre table.
+            {content.heroDescription}
           </p>
 
           {/* CTA Buttons */}
@@ -59,7 +61,7 @@ const Hero = () => {
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </a>
             <a
-              href="https://wa.me/2250787677108?text=Bonjour%20M.%20GUESSAN,%20je%20suis%20intéressé%20par%20vos%20produits%20agricoles."
+              href={`https://wa.me/${content.whatsappNumber}?text=Bonjour%20M.%20GUESSAN,%20je%20suis%20intéressé%20par%20vos%20produits%20agricoles.`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-whatsapp"

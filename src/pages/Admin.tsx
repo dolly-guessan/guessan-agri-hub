@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
-  Image,
   FileText,
   Settings,
   Save,
@@ -10,68 +9,27 @@ import {
   LogOut,
   Plus,
   Trash2,
-  Youtube,
   Home,
   Package,
   HelpCircle,
   User,
+  MessageSquare,
+  Star,
+  RefreshCw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useContent, type Product, type FAQ, type Testimonial } from "@/contexts/ContentContext";
 
-interface ContentData {
-  heroTitle: string;
-  heroSubtitle: string;
-  aboutText: string;
-  products: Array<{
-    id: number;
-    name: string;
-    description: string;
-    category: string;
-  }>;
-  faqs: Array<{
-    question: string;
-    answer: string;
-  }>;
-  seoTitle: string;
-  seoDescription: string;
-  contactPhone1: string;
-  contactPhone2: string;
-  contactEmail: string;
-}
-
-const defaultContent: ContentData = {
-  heroTitle: "GUESSAN BI DOLI",
-  heroSubtitle: "Votre cultivateur de confiance à Gagnoa, Côte d'Ivoire",
-  aboutText:
-    "Je suis GUESSAN BI DOLI, agriculteur passionné basé à Gagnoa, au cœur de la Côte d'Ivoire...",
-  products: [
-    { id: 1, name: "Riz Blanc Local", description: "Riz de qualité supérieure", category: "Céréales" },
-    { id: 2, name: "Légumes Frais", description: "Légumes cultivés naturellement", category: "Légumes" },
-  ],
-  faqs: [
-    { question: "Quels types de produits cultivez-vous ?", answer: "Je cultive du riz local, des légumes frais..." },
-  ],
-  seoTitle: "GUESSAN BI DOLI – Agriculteur à Gagnoa, Côte d'Ivoire",
-  seoDescription: "Contactez GUESSAN BI DOLI, cultivateur passionné à Gagnoa...",
-  contactPhone1: "0500216855",
-  contactPhone2: "0787677108",
-  contactEmail: "guessandoli55@gmail.com",
-};
-
-type Tab = "overview" | "content" | "products" | "faq" | "settings";
+type Tab = "overview" | "hero" | "about" | "products" | "faq" | "testimonials" | "settings";
 
 const Admin = () => {
   const { toast } = useToast();
+  const { content, updateContent, saveContent, resetContent } = useContent();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
-  const [content, setContent] = useState<ContentData>(defaultContent);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("admin_content");
-    if (saved) {
-      setContent(JSON.parse(saved));
-    }
     const auth = localStorage.getItem("admin_auth");
     if (auth === "true") {
       setIsLoggedIn(true);
@@ -95,40 +53,74 @@ const Admin = () => {
     toast({ title: "Déconnexion", description: "À bientôt !" });
   };
 
-  const saveContent = () => {
-    localStorage.setItem("admin_content", JSON.stringify(content));
+  const handleSave = () => {
+    saveContent();
     toast({ title: "Sauvegardé !", description: "Les modifications ont été enregistrées" });
   };
 
+  const handleReset = () => {
+    if (confirm("Êtes-vous sûr de vouloir réinitialiser tout le contenu ?")) {
+      resetContent();
+      toast({ title: "Réinitialisé", description: "Le contenu par défaut a été restauré" });
+    }
+  };
+
   const addProduct = () => {
-    setContent((prev) => ({
-      ...prev,
-      products: [
-        ...prev.products,
-        { id: Date.now(), name: "Nouveau produit", description: "Description", category: "Catégorie" },
-      ],
-    }));
+    const newProduct: Product = {
+      id: Date.now(),
+      name: "Nouveau produit",
+      description: "Description du produit",
+      category: "Catégorie",
+    };
+    updateContent({ products: [...content.products, newProduct] });
+  };
+
+  const updateProduct = (id: number, field: keyof Product, value: string) => {
+    const updated = content.products.map((p) =>
+      p.id === id ? { ...p, [field]: value } : p
+    );
+    updateContent({ products: updated });
   };
 
   const removeProduct = (id: number) => {
-    setContent((prev) => ({
-      ...prev,
-      products: prev.products.filter((p) => p.id !== id),
-    }));
+    updateContent({ products: content.products.filter((p) => p.id !== id) });
   };
 
   const addFaq = () => {
-    setContent((prev) => ({
-      ...prev,
-      faqs: [...prev.faqs, { question: "Nouvelle question ?", answer: "Réponse..." }],
-    }));
+    const newFaq: FAQ = { question: "Nouvelle question ?", answer: "Réponse..." };
+    updateContent({ faqs: [...content.faqs, newFaq] });
+  };
+
+  const updateFaq = (index: number, field: keyof FAQ, value: string) => {
+    const updated = [...content.faqs];
+    updated[index] = { ...updated[index], [field]: value };
+    updateContent({ faqs: updated });
   };
 
   const removeFaq = (index: number) => {
-    setContent((prev) => ({
-      ...prev,
-      faqs: prev.faqs.filter((_, i) => i !== index),
-    }));
+    updateContent({ faqs: content.faqs.filter((_, i) => i !== index) });
+  };
+
+  const addTestimonial = () => {
+    const newTestimonial: Testimonial = {
+      id: Date.now(),
+      name: "Nouveau client",
+      role: "Profession",
+      content: "Témoignage...",
+      rating: 5,
+    };
+    updateContent({ testimonials: [...content.testimonials, newTestimonial] });
+  };
+
+  const updateTestimonial = (id: number, field: keyof Testimonial, value: string | number) => {
+    const updated = content.testimonials.map((t) =>
+      t.id === id ? { ...t, [field]: value } : t
+    );
+    updateContent({ testimonials: updated });
+  };
+
+  const removeTestimonial = (id: number) => {
+    updateContent({ testimonials: content.testimonials.filter((t) => t.id !== id) });
   };
 
   if (!isLoggedIn) {
@@ -145,9 +137,7 @@ const Admin = () => {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Mot de passe
-              </label>
+              <label className="block text-sm font-medium text-foreground mb-2">Mot de passe</label>
               <input
                 type="password"
                 value={password}
@@ -174,9 +164,11 @@ const Admin = () => {
 
   const tabs = [
     { id: "overview" as Tab, label: "Aperçu", icon: LayoutDashboard },
-    { id: "content" as Tab, label: "Contenu", icon: FileText },
+    { id: "hero" as Tab, label: "Hero", icon: Home },
+    { id: "about" as Tab, label: "À propos", icon: FileText },
     { id: "products" as Tab, label: "Produits", icon: Package },
     { id: "faq" as Tab, label: "FAQ", icon: HelpCircle },
+    { id: "testimonials" as Tab, label: "Témoignages", icon: MessageSquare },
     { id: "settings" as Tab, label: "Paramètres", icon: Settings },
   ];
 
@@ -196,20 +188,24 @@ const Admin = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <button onClick={handleSave} className="btn-hero text-sm">
+              <Save className="w-4 h-4" />
+              Sauvegarder
+            </button>
             <Link
               to="/"
               target="_blank"
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <Eye className="w-4 h-4" />
-              Voir le site
+              <span className="hidden sm:inline">Voir le site</span>
             </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors"
             >
               <LogOut className="w-4 h-4" />
-              Déconnexion
+              <span className="hidden sm:inline">Déconnexion</span>
             </button>
           </div>
         </div>
@@ -235,6 +231,15 @@ const Admin = () => {
                 </button>
               ))}
             </nav>
+            <div className="mt-6 pt-6 border-t border-border">
+              <button
+                onClick={handleReset}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+              >
+                <RefreshCw className="w-5 h-5" />
+                Réinitialiser
+              </button>
+            </div>
           </aside>
 
           {/* Main Content */}
@@ -242,8 +247,8 @@ const Admin = () => {
             {/* Overview Tab */}
             {activeTab === "overview" && (
               <div>
-                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Aperçu</h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Aperçu du site</h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                   <div className="p-6 rounded-xl bg-primary/10">
                     <Package className="w-8 h-8 text-primary mb-2" />
                     <p className="text-2xl font-bold text-foreground">{content.products.length}</p>
@@ -255,58 +260,110 @@ const Admin = () => {
                     <p className="text-sm text-muted-foreground">Questions FAQ</p>
                   </div>
                   <div className="p-6 rounded-xl bg-secondary/10">
-                    <Image className="w-8 h-8 text-secondary mb-2" />
+                    <MessageSquare className="w-8 h-8 text-secondary mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{content.testimonials.length}</p>
+                    <p className="text-sm text-muted-foreground">Témoignages</p>
+                  </div>
+                  <div className="p-6 rounded-xl bg-primary/5">
+                    <Star className="w-8 h-8 text-primary mb-2" />
                     <p className="text-2xl font-bold text-foreground">10</p>
                     <p className="text-sm text-muted-foreground">Images</p>
                   </div>
                 </div>
-                <p className="text-muted-foreground">
-                  Utilisez les onglets pour gérer le contenu de votre site.
-                </p>
+                <div className="p-6 rounded-xl bg-muted/50">
+                  <h3 className="font-semibold text-foreground mb-2">Guide rapide</h3>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li>• Utilisez les onglets pour modifier chaque section du site</li>
+                    <li>• Cliquez sur "Sauvegarder" pour enregistrer vos modifications</li>
+                    <li>• Cliquez sur "Voir le site" pour prévisualiser les changements</li>
+                    <li>• Les modifications sont visibles immédiatement sur le site</li>
+                  </ul>
+                </div>
               </div>
             )}
 
-            {/* Content Tab */}
-            {activeTab === "content" && (
+            {/* Hero Tab */}
+            {activeTab === "hero" && (
               <div>
-                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
-                  Gestion du contenu
-                </h2>
+                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Section Hero</h2>
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Titre Hero
-                    </label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Titre principal</label>
                     <input
                       type="text"
                       value={content.heroTitle}
-                      onChange={(e) => setContent((prev) => ({ ...prev, heroTitle: e.target.value }))}
+                      onChange={(e) => updateContent({ heroTitle: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Sous-titre Hero
-                    </label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Sous-titre</label>
                     <input
                       type="text"
                       value={content.heroSubtitle}
-                      onChange={(e) => setContent((prev) => ({ ...prev, heroSubtitle: e.target.value }))}
+                      onChange={(e) => updateContent({ heroSubtitle: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Texte À propos
-                    </label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Description</label>
                     <textarea
-                      value={content.aboutText}
-                      onChange={(e) => setContent((prev) => ({ ...prev, aboutText: e.target.value }))}
-                      rows={5}
+                      value={content.heroDescription}
+                      onChange={(e) => updateContent({ heroDescription: e.target.value })}
+                      rows={3}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
-                  <button onClick={saveContent} className="btn-hero">
+                  <button onClick={handleSave} className="btn-hero">
+                    <Save className="w-5 h-5" />
+                    Sauvegarder
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* About Tab */}
+            {activeTab === "about" && (
+              <div>
+                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Section À propos</h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Titre de la section</label>
+                    <input
+                      type="text"
+                      value={content.aboutTitle}
+                      onChange={(e) => updateContent({ aboutTitle: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Paragraphe 1</label>
+                    <textarea
+                      value={content.aboutText}
+                      onChange={(e) => updateContent({ aboutText: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Paragraphe 2</label>
+                    <textarea
+                      value={content.aboutText2}
+                      onChange={(e) => updateContent({ aboutText2: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Paragraphe 3</label>
+                    <textarea
+                      value={content.aboutText3}
+                      onChange={(e) => updateContent({ aboutText3: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                    />
+                  </div>
+                  <button onClick={handleSave} className="btn-hero">
                     <Save className="w-5 h-5" />
                     Sauvegarder
                   </button>
@@ -318,37 +375,27 @@ const Admin = () => {
             {activeTab === "products" && (
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-foreground">
-                    Gestion des produits
-                  </h2>
+                  <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des produits</h2>
                   <button onClick={addProduct} className="btn-hero text-sm">
                     <Plus className="w-4 h-4" />
                     Ajouter
                   </button>
                 </div>
                 <div className="space-y-4">
-                  {content.products.map((product, index) => (
+                  {content.products.map((product) => (
                     <div key={product.id} className="p-4 rounded-xl bg-muted/50 border border-border">
                       <div className="grid sm:grid-cols-3 gap-4 mb-4">
                         <input
                           type="text"
                           value={product.name}
-                          onChange={(e) => {
-                            const newProducts = [...content.products];
-                            newProducts[index].name = e.target.value;
-                            setContent((prev) => ({ ...prev, products: newProducts }));
-                          }}
+                          onChange={(e) => updateProduct(product.id, "name", e.target.value)}
                           placeholder="Nom"
                           className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                         />
                         <input
                           type="text"
                           value={product.category}
-                          onChange={(e) => {
-                            const newProducts = [...content.products];
-                            newProducts[index].category = e.target.value;
-                            setContent((prev) => ({ ...prev, products: newProducts }));
-                          }}
+                          onChange={(e) => updateProduct(product.id, "category", e.target.value)}
                           placeholder="Catégorie"
                           className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                         />
@@ -362,11 +409,7 @@ const Admin = () => {
                       </div>
                       <textarea
                         value={product.description}
-                        onChange={(e) => {
-                          const newProducts = [...content.products];
-                          newProducts[index].description = e.target.value;
-                          setContent((prev) => ({ ...prev, products: newProducts }));
-                        }}
+                        onChange={(e) => updateProduct(product.id, "description", e.target.value)}
                         placeholder="Description"
                         rows={2}
                         className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
@@ -374,7 +417,7 @@ const Admin = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={saveContent} className="btn-hero mt-6">
+                <button onClick={handleSave} className="btn-hero mt-6">
                   <Save className="w-5 h-5" />
                   Sauvegarder
                 </button>
@@ -385,9 +428,7 @@ const Admin = () => {
             {activeTab === "faq" && (
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-heading font-bold text-foreground">
-                    Gestion des FAQ
-                  </h2>
+                  <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des FAQ</h2>
                   <button onClick={addFaq} className="btn-hero text-sm">
                     <Plus className="w-4 h-4" />
                     Ajouter
@@ -400,11 +441,7 @@ const Admin = () => {
                         <input
                           type="text"
                           value={faq.question}
-                          onChange={(e) => {
-                            const newFaqs = [...content.faqs];
-                            newFaqs[index].question = e.target.value;
-                            setContent((prev) => ({ ...prev, faqs: newFaqs }));
-                          }}
+                          onChange={(e) => updateFaq(index, "question", e.target.value)}
                           placeholder="Question"
                           className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                         />
@@ -417,11 +454,7 @@ const Admin = () => {
                       </div>
                       <textarea
                         value={faq.answer}
-                        onChange={(e) => {
-                          const newFaqs = [...content.faqs];
-                          newFaqs[index].answer = e.target.value;
-                          setContent((prev) => ({ ...prev, faqs: newFaqs }));
-                        }}
+                        onChange={(e) => updateFaq(index, "answer", e.target.value)}
                         placeholder="Réponse"
                         rows={3}
                         className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
@@ -429,7 +462,70 @@ const Admin = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={saveContent} className="btn-hero mt-6">
+                <button onClick={handleSave} className="btn-hero mt-6">
+                  <Save className="w-5 h-5" />
+                  Sauvegarder
+                </button>
+              </div>
+            )}
+
+            {/* Testimonials Tab */}
+            {activeTab === "testimonials" && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des témoignages</h2>
+                  <button onClick={addTestimonial} className="btn-hero text-sm">
+                    <Plus className="w-4 h-4" />
+                    Ajouter
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {content.testimonials.map((testimonial) => (
+                    <div key={testimonial.id} className="p-4 rounded-xl bg-muted/50 border border-border">
+                      <div className="grid sm:grid-cols-3 gap-4 mb-4">
+                        <input
+                          type="text"
+                          value={testimonial.name}
+                          onChange={(e) => updateTestimonial(testimonial.id, "name", e.target.value)}
+                          placeholder="Nom"
+                          className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                        <input
+                          type="text"
+                          value={testimonial.role}
+                          onChange={(e) => updateTestimonial(testimonial.id, "role", e.target.value)}
+                          placeholder="Profession"
+                          className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={testimonial.rating}
+                            onChange={(e) => updateTestimonial(testimonial.id, "rating", parseInt(e.target.value))}
+                            className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          >
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <option key={n} value={n}>{n} étoile{n > 1 ? "s" : ""}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => removeTestimonial(testimonial.id)}
+                            className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      <textarea
+                        value={testimonial.content}
+                        onChange={(e) => updateTestimonial(testimonial.id, "content", e.target.value)}
+                        placeholder="Témoignage"
+                        rows={3}
+                        className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <button onClick={handleSave} className="btn-hero mt-6">
                   <Save className="w-5 h-5" />
                   Sauvegarder
                 </button>
@@ -439,68 +535,81 @@ const Admin = () => {
             {/* Settings Tab */}
             {activeTab === "settings" && (
               <div>
-                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
-                  Paramètres SEO & Contact
-                </h2>
+                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Paramètres SEO & Contact</h2>
                 <div className="space-y-6">
+                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 mb-6">
+                    <h3 className="font-semibold text-foreground mb-2">SEO</h3>
+                    <p className="text-sm text-muted-foreground">Ces paramètres affectent le référencement du site.</p>
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Titre SEO
-                    </label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Titre SEO</label>
                     <input
                       type="text"
                       value={content.seoTitle}
-                      onChange={(e) => setContent((prev) => ({ ...prev, seoTitle: e.target.value }))}
+                      onChange={(e) => updateContent({ seoTitle: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Meta Description
-                    </label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Meta Description</label>
                     <textarea
                       value={content.seoDescription}
-                      onChange={(e) => setContent((prev) => ({ ...prev, seoDescription: e.target.value }))}
+                      onChange={(e) => updateContent({ seoDescription: e.target.value })}
                       rows={3}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        Téléphone 1
-                      </label>
-                      <input
-                        type="text"
-                        value={content.contactPhone1}
-                        onChange={(e) => setContent((prev) => ({ ...prev, contactPhone1: e.target.value }))}
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        Téléphone 2
-                      </label>
-                      <input
-                        type="text"
-                        value={content.contactPhone2}
-                        onChange={(e) => setContent((prev) => ({ ...prev, contactPhone2: e.target.value }))}
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
+                  <div className="border-t border-border pt-6">
+                    <h3 className="font-semibold text-foreground mb-4">Contact</h3>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">Téléphone 1</label>
+                        <input
+                          type="text"
+                          value={content.contactPhone1}
+                          onChange={(e) => updateContent({ contactPhone1: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">Téléphone 2</label>
+                        <input
+                          type="text"
+                          value={content.contactPhone2}
+                          onChange={(e) => updateContent({ contactPhone2: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Email
-                    </label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Email</label>
                     <input
                       type="email"
                       value={content.contactEmail}
-                      onChange={(e) => setContent((prev) => ({ ...prev, contactEmail: e.target.value }))}
+                      onChange={(e) => updateContent({ contactEmail: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
-                  <button onClick={saveContent} className="btn-hero">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Numéro WhatsApp (format: 2250787677108)</label>
+                    <input
+                      type="text"
+                      value={content.whatsappNumber}
+                      onChange={(e) => updateContent({ whatsappNumber: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Adresse</label>
+                    <input
+                      type="text"
+                      value={content.address}
+                      onChange={(e) => updateContent({ address: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <button onClick={handleSave} className="btn-hero">
                     <Save className="w-5 h-5" />
                     Sauvegarder
                   </button>

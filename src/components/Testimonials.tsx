@@ -1,33 +1,9 @@
 import { Star, Quote } from "lucide-react";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Kouamé Adjoua",
-    role: "Restauratrice à Gagnoa",
-    content:
-      "Le riz de M. GUESSAN est d'une qualité exceptionnelle. Mes clients adorent ! Je recommande vivement ses produits pour tous les professionnels de la restauration.",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "Yao Koffi",
-    role: "Commerçant",
-    content:
-      "Cela fait 3 ans que je travaille avec GUESSAN BI DOLI. Son riz se vend très bien sur le marché. Un partenaire fiable et ses prix sont justes.",
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: "Marie Brou",
-    role: "Ménagère",
-    content:
-      "Les légumes sont toujours frais et délicieux. M. GUESSAN livre directement chez moi à Gagnoa. Service impeccable et produits de qualité !",
-    rating: 5,
-  },
-];
+import { useContent } from "@/contexts/ContentContext";
 
 const Testimonials = () => {
+  const { content } = useContent();
+
   return (
     <section className="py-20 lg:py-32 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -46,7 +22,7 @@ const Testimonials = () => {
 
         {/* Testimonials Grid */}
         <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
+          {content.testimonials.map((testimonial, index) => (
             <article
               key={testimonial.id}
               className="relative bg-card rounded-2xl p-8 shadow-card hover:shadow-soft transition-shadow duration-300"
