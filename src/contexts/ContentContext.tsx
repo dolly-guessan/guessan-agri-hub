@@ -1,11 +1,11 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 export interface Product {
   id: number;
   name: string;
   description: string;
   category: string;
-  image?: string;
+  image: string;
 }
 
 export interface FAQ {
@@ -31,10 +31,12 @@ export interface SiteContent {
   heroTitle: string;
   heroSubtitle: string;
   heroDescription: string;
+  heroImage: string;
   aboutTitle: string;
   aboutText: string;
   aboutText2: string;
   aboutText3: string;
+  aboutImage: string;
   products: Product[];
   faqs: FAQ[];
   testimonials: Testimonial[];
@@ -52,17 +54,19 @@ const defaultContent: SiteContent = {
   heroTitle: "GUESSAN BI DOLI",
   heroSubtitle: "Votre cultivateur de confiance à Gagnoa, Côte d'Ivoire",
   heroDescription: "Du riz local de qualité supérieure et des légumes frais cultivés avec passion, directement de mes champs à votre table.",
+  heroImage: "",
   aboutTitle: "Un agriculteur dévoué à votre satisfaction",
   aboutText: "Je suis GUESSAN BI DOLI, agriculteur passionné basé à Gagnoa, au cœur de la Côte d'Ivoire. Depuis plus de 10 ans, je cultive avec amour et dévouement du riz local de qualité supérieure, des légumes frais et divers produits agricoles.",
   aboutText2: "Ma mission est simple : vous offrir des produits sains, cultivés selon les méthodes traditionnelles ivoiriennes, tout en respectant notre belle terre. Chaque grain de riz, chaque légume que je produis porte la marque de mon engagement envers la qualité et l'authenticité.",
   aboutText3: "Que vous soyez un particulier ou un professionnel, je suis à votre disposition pour répondre à vos besoins en produits agricoles frais et de qualité.",
+  aboutImage: "",
   products: [
-    { id: 1, name: "Riz Blanc Local", description: "Riz de qualité supérieure, cultivé et décortiqué localement. Grain long et parfumé.", category: "Céréales" },
-    { id: 2, name: "Variétés de Riz", description: "Différentes variétés de riz local : blanc, brun, rouge. Chacun avec ses saveurs uniques.", category: "Céréales" },
-    { id: 3, name: "Choux et Légumes", description: "Légumes frais cultivés naturellement. Choux, salades et légumes de saison.", category: "Légumes" },
-    { id: 4, name: "Plants de Banane", description: "Plants de bananiers sains et vigoureux, prêts à être transplantés.", category: "Plants" },
-    { id: 5, name: "Pépinière", description: "Large sélection de plants et semis pour votre exploitation agricole.", category: "Plants" },
-    { id: 6, name: "Riz Paddy", description: "Riz paddy séché au soleil, prêt pour le décorticage ou la conservation.", category: "Céréales" },
+    { id: 1, name: "Riz Blanc Local", description: "Riz de qualité supérieure, cultivé et décortiqué localement. Grain long et parfumé.", category: "Céréales", image: "" },
+    { id: 2, name: "Variétés de Riz", description: "Différentes variétés de riz local : blanc, brun, rouge. Chacun avec ses saveurs uniques.", category: "Céréales", image: "" },
+    { id: 3, name: "Choux et Légumes", description: "Légumes frais cultivés naturellement. Choux, salades et légumes de saison.", category: "Légumes", image: "" },
+    { id: 4, name: "Plants de Banane", description: "Plants de bananiers sains et vigoureux, prêts à être transplantés.", category: "Plants", image: "" },
+    { id: 5, name: "Pépinière", description: "Large sélection de plants et semis pour votre exploitation agricole.", category: "Plants", image: "" },
+    { id: 6, name: "Riz Paddy", description: "Riz paddy séché au soleil, prêt pour le décorticage ou la conservation.", category: "Céréales", image: "" },
   ],
   faqs: [
     { question: "Quels types de produits cultivez-vous ?", answer: "Je cultive principalement du riz local de plusieurs variétés (blanc, brun, rouge), des légumes frais comme le chou et la salade, ainsi que des plants de bananiers. Je dispose également d'une pépinière pour différents types de plants." },
@@ -78,14 +82,14 @@ const defaultContent: SiteContent = {
     { id: 3, name: "Marie Brou", role: "Ménagère", content: "Les légumes sont toujours frais et délicieux. M. GUESSAN livre directement chez moi à Gagnoa. Service impeccable et produits de qualité !", rating: 5 },
   ],
   gallery: [
-    { id: 1, src: "rice-field", alt: "Vue panoramique des rizières à Gagnoa" },
-    { id: 2, src: "paddy-field", alt: "Champs de riz en croissance" },
-    { id: 3, src: "tractor", alt: "Travail des champs avec tracteur" },
-    { id: 4, src: "vegetables", alt: "Culture de légumes frais" },
-    { id: 5, src: "rice-varieties", alt: "Différentes variétés de riz" },
-    { id: 6, src: "drying-rice", alt: "Séchage du riz au soleil" },
-    { id: 7, src: "seedlings", alt: "Pépinière de plants" },
-    { id: 8, src: "plantain", alt: "Plants de bananiers" },
+    { id: 1, src: "", alt: "Vue panoramique des rizières à Gagnoa" },
+    { id: 2, src: "", alt: "Champs de riz en croissance" },
+    { id: 3, src: "", alt: "Travail des champs avec tracteur" },
+    { id: 4, src: "", alt: "Culture de légumes frais" },
+    { id: 5, src: "", alt: "Différentes variétés de riz" },
+    { id: 6, src: "", alt: "Séchage du riz au soleil" },
+    { id: 7, src: "", alt: "Pépinière de plants" },
+    { id: 8, src: "", alt: "Plants de bananiers" },
   ],
   seoTitle: "GUESSAN BI DOLI – Agriculteur à Gagnoa, Côte d'Ivoire",
   seoDescription: "Contactez GUESSAN BI DOLI, cultivateur passionné à Gagnoa, pour des fruits et légumes frais et de qualité.",

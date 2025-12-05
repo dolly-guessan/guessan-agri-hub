@@ -16,11 +16,13 @@ import {
   MessageSquare,
   Star,
   RefreshCw,
+  Image,
+  ImagePlus,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useContent, type Product, type FAQ, type Testimonial } from "@/contexts/ContentContext";
+import { useContent, type Product, type FAQ, type Testimonial, type GalleryImage } from "@/contexts/ContentContext";
 
-type Tab = "overview" | "hero" | "about" | "products" | "faq" | "testimonials" | "settings";
+type Tab = "overview" | "hero" | "about" | "products" | "gallery" | "faq" | "testimonials" | "settings";
 
 const Admin = () => {
   const { toast } = useToast();
@@ -65,12 +67,14 @@ const Admin = () => {
     }
   };
 
+  // Products
   const addProduct = () => {
     const newProduct: Product = {
       id: Date.now(),
       name: "Nouveau produit",
       description: "Description du produit",
       category: "Catégorie",
+      image: "",
     };
     updateContent({ products: [...content.products, newProduct] });
   };
@@ -86,6 +90,28 @@ const Admin = () => {
     updateContent({ products: content.products.filter((p) => p.id !== id) });
   };
 
+  // Gallery
+  const addGalleryImage = () => {
+    const newImage: GalleryImage = {
+      id: Date.now(),
+      src: "",
+      alt: "Nouvelle image",
+    };
+    updateContent({ gallery: [...content.gallery, newImage] });
+  };
+
+  const updateGalleryImage = (id: number, field: keyof GalleryImage, value: string) => {
+    const updated = content.gallery.map((img) =>
+      img.id === id ? { ...img, [field]: value } : img
+    );
+    updateContent({ gallery: updated });
+  };
+
+  const removeGalleryImage = (id: number) => {
+    updateContent({ gallery: content.gallery.filter((img) => img.id !== id) });
+  };
+
+  // FAQ
   const addFaq = () => {
     const newFaq: FAQ = { question: "Nouvelle question ?", answer: "Réponse..." };
     updateContent({ faqs: [...content.faqs, newFaq] });
@@ -101,6 +127,7 @@ const Admin = () => {
     updateContent({ faqs: content.faqs.filter((_, i) => i !== index) });
   };
 
+  // Testimonials
   const addTestimonial = () => {
     const newTestimonial: Testimonial = {
       id: Date.now(),
@@ -167,10 +194,30 @@ const Admin = () => {
     { id: "hero" as Tab, label: "Hero", icon: Home },
     { id: "about" as Tab, label: "À propos", icon: FileText },
     { id: "products" as Tab, label: "Produits", icon: Package },
+    { id: "gallery" as Tab, label: "Galerie", icon: Image },
     { id: "faq" as Tab, label: "FAQ", icon: HelpCircle },
     { id: "testimonials" as Tab, label: "Témoignages", icon: MessageSquare },
     { id: "settings" as Tab, label: "Paramètres", icon: Settings },
   ];
+
+  const ImageInput = ({ label, value, onChange, preview = true }: { label: string; value: string; onChange: (v: string) => void; preview?: boolean }) => (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-foreground">{label}</label>
+      <input
+        type="url"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="https://exemple.com/image.jpg"
+        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+      />
+      {preview && value && (
+        <div className="mt-2 relative aspect-video w-full max-w-xs rounded-lg overflow-hidden border border-border">
+          <img src={value} alt="Aperçu" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+        </div>
+      )}
+      <p className="text-xs text-muted-foreground">Collez l'URL d'une image (hébergée en ligne)</p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-muted">
@@ -255,28 +302,29 @@ const Admin = () => {
                     <p className="text-sm text-muted-foreground">Produits</p>
                   </div>
                   <div className="p-6 rounded-xl bg-accent/10">
-                    <HelpCircle className="w-8 h-8 text-accent mb-2" />
+                    <Image className="w-8 h-8 text-accent mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{content.gallery.length}</p>
+                    <p className="text-sm text-muted-foreground">Images galerie</p>
+                  </div>
+                  <div className="p-6 rounded-xl bg-secondary/10">
+                    <HelpCircle className="w-8 h-8 text-secondary mb-2" />
                     <p className="text-2xl font-bold text-foreground">{content.faqs.length}</p>
                     <p className="text-sm text-muted-foreground">Questions FAQ</p>
                   </div>
-                  <div className="p-6 rounded-xl bg-secondary/10">
-                    <MessageSquare className="w-8 h-8 text-secondary mb-2" />
-                    <p className="text-2xl font-bold text-foreground">{content.testimonials.length}</p>
-                    <p className="text-sm text-muted-foreground">Témoignages</p>
-                  </div>
                   <div className="p-6 rounded-xl bg-primary/5">
                     <Star className="w-8 h-8 text-primary mb-2" />
-                    <p className="text-2xl font-bold text-foreground">10</p>
-                    <p className="text-sm text-muted-foreground">Images</p>
+                    <p className="text-2xl font-bold text-foreground">{content.testimonials.length}</p>
+                    <p className="text-sm text-muted-foreground">Témoignages</p>
                   </div>
                 </div>
                 <div className="p-6 rounded-xl bg-muted/50">
                   <h3 className="font-semibold text-foreground mb-2">Guide rapide</h3>
                   <ul className="text-sm text-muted-foreground space-y-2">
-                    <li>• Utilisez les onglets pour modifier chaque section du site</li>
+                    <li>• <strong>Hero</strong> : Modifiez le titre, slogan et image d'accueil</li>
+                    <li>• <strong>À propos</strong> : Éditez votre présentation et photo</li>
+                    <li>• <strong>Produits</strong> : Ajoutez/modifiez vos produits avec images</li>
+                    <li>• <strong>Galerie</strong> : Gérez les images de votre galerie</li>
                     <li>• Cliquez sur "Sauvegarder" pour enregistrer vos modifications</li>
-                    <li>• Cliquez sur "Voir le site" pour prévisualiser les changements</li>
-                    <li>• Les modifications sont visibles immédiatement sur le site</li>
                   </ul>
                 </div>
               </div>
@@ -314,6 +362,11 @@ const Admin = () => {
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
+                  <ImageInput
+                    label="Image d'arrière-plan Hero"
+                    value={content.heroImage}
+                    onChange={(v) => updateContent({ heroImage: v })}
+                  />
                   <button onClick={handleSave} className="btn-hero">
                     <Save className="w-5 h-5" />
                     Sauvegarder
@@ -363,6 +416,11 @@ const Admin = () => {
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
+                  <ImageInput
+                    label="Image À propos"
+                    value={content.aboutImage}
+                    onChange={(v) => updateContent({ aboutImage: v })}
+                  />
                   <button onClick={handleSave} className="btn-hero">
                     <Save className="w-5 h-5" />
                     Sauvegarder
@@ -381,39 +439,128 @@ const Admin = () => {
                     Ajouter
                   </button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {content.products.map((product) => (
-                    <div key={product.id} className="p-4 rounded-xl bg-muted/50 border border-border">
-                      <div className="grid sm:grid-cols-3 gap-4 mb-4">
-                        <input
-                          type="text"
-                          value={product.name}
-                          onChange={(e) => updateProduct(product.id, "name", e.target.value)}
-                          placeholder="Nom"
-                          className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                        <input
-                          type="text"
-                          value={product.category}
-                          onChange={(e) => updateProduct(product.id, "category", e.target.value)}
-                          placeholder="Catégorie"
-                          className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
+                    <div key={product.id} className="p-6 rounded-xl bg-muted/50 border border-border">
+                      <div className="flex items-start justify-between mb-4">
+                        <h3 className="font-semibold text-foreground">{product.name || "Sans nom"}</h3>
                         <button
                           onClick={() => removeProduct(product.id)}
-                          className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm"
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm"
                         >
                           <Trash2 className="w-4 h-4" />
                           Supprimer
                         </button>
                       </div>
-                      <textarea
-                        value={product.description}
-                        onChange={(e) => updateProduct(product.id, "description", e.target.value)}
-                        placeholder="Description"
-                        rows={2}
-                        className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                      />
+                      <div className="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">Nom du produit</label>
+                          <input
+                            type="text"
+                            value={product.name}
+                            onChange={(e) => updateProduct(product.id, "name", e.target.value)}
+                            placeholder="Nom"
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">Catégorie</label>
+                          <input
+                            type="text"
+                            value={product.category}
+                            onChange={(e) => updateProduct(product.id, "category", e.target.value)}
+                            placeholder="Catégorie"
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-foreground mb-2">Description</label>
+                        <textarea
+                          value={product.description}
+                          onChange={(e) => updateProduct(product.id, "description", e.target.value)}
+                          placeholder="Description"
+                          rows={2}
+                          className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">Image du produit (URL)</label>
+                        <input
+                          type="url"
+                          value={product.image}
+                          onChange={(e) => updateProduct(product.id, "image", e.target.value)}
+                          placeholder="https://exemple.com/image.jpg"
+                          className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                        {product.image && (
+                          <div className="mt-2 w-32 h-24 rounded-lg overflow-hidden border border-border">
+                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={handleSave} className="btn-hero mt-6">
+                  <Save className="w-5 h-5" />
+                  Sauvegarder
+                </button>
+              </div>
+            )}
+
+            {/* Gallery Tab */}
+            {activeTab === "gallery" && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-heading font-bold text-foreground">Gestion de la galerie</h2>
+                  <button onClick={addGalleryImage} className="btn-hero text-sm">
+                    <ImagePlus className="w-4 h-4" />
+                    Ajouter une image
+                  </button>
+                </div>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Ajoutez des URLs d'images pour votre galerie. Les images par défaut seront utilisées si l'URL est vide.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {content.gallery.map((image) => (
+                    <div key={image.id} className="p-4 rounded-xl bg-muted/50 border border-border">
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="text-sm font-medium text-foreground">Image #{content.gallery.indexOf(image) + 1}</span>
+                        <button
+                          onClick={() => removeGalleryImage(image.id)}
+                          className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs text-muted-foreground mb-1">URL de l'image</label>
+                          <input
+                            type="url"
+                            value={image.src}
+                            onChange={(e) => updateGalleryImage(image.id, "src", e.target.value)}
+                            placeholder="https://exemple.com/image.jpg"
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-muted-foreground mb-1">Description (alt)</label>
+                          <input
+                            type="text"
+                            value={image.alt}
+                            onChange={(e) => updateGalleryImage(image.id, "alt", e.target.value)}
+                            placeholder="Description de l'image"
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                        {image.src && (
+                          <div className="w-full aspect-video rounded-lg overflow-hidden border border-border">
+                            <img src={image.src} alt={image.alt} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

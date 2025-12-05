@@ -1,13 +1,13 @@
 import { MessageCircle } from "lucide-react";
+import { useContent } from "@/contexts/ContentContext";
 import riceWhite from "@/assets/rice-white.jpg";
 import riceVarieties from "@/assets/rice-varieties.jpg";
 import vegetables from "@/assets/vegetables.jpg";
 import plantain from "@/assets/plantain.jpg";
 import seedlings from "@/assets/seedlings.jpg";
 import dryingRice from "@/assets/drying-rice.jpg";
-import { useContent } from "@/contexts/ContentContext";
 
-const productImages: Record<number, string> = {
+const defaultProductImages: Record<number, string> = {
   1: riceWhite,
   2: riceVarieties,
   3: vegetables,
@@ -18,6 +18,11 @@ const productImages: Record<number, string> = {
 
 const Products = () => {
   const { content } = useContent();
+
+  const getProductImage = (product: { id: number; image: string }) => {
+    if (product.image) return product.image;
+    return defaultProductImages[product.id] || riceWhite;
+  };
 
   return (
     <section id="produits" className="py-20 lg:py-32 bg-muted/30">
@@ -46,7 +51,7 @@ const Products = () => {
               {/* Image */}
               <div className="relative overflow-hidden aspect-[4/3]">
                 <img
-                  src={productImages[product.id] || riceWhite}
+                  src={getProductImage(product)}
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
