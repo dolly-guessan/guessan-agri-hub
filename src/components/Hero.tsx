@@ -4,6 +4,7 @@ import { useContent } from "@/contexts/ContentContext";
 
 const Hero = () => {
   const { content } = useContent();
+  const heroImage = content.heroImage || heroFarmer;
 
   return (
     <section
@@ -13,7 +14,7 @@ const Hero = () => {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src={heroFarmer}
+          src={heroImage}
           alt="GUESSAN BI DOLI dans ses champs de riz à Gagnoa"
           className="w-full h-full object-cover"
         />

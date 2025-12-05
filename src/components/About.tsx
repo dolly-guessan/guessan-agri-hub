@@ -4,6 +4,7 @@ import { useContent } from "@/contexts/ContentContext";
 
 const About = () => {
   const { content } = useContent();
+  const aboutImage = content.aboutImage || riceField;
 
   const values = [
     {
@@ -36,7 +37,7 @@ const About = () => {
           <div className="relative">
             <div className="relative rounded-3xl overflow-hidden shadow-soft">
               <img
-                src={riceField}
+                src={aboutImage}
                 alt="Champs de riz de GUESSAN BI DOLI à Gagnoa"
                 className="w-full h-[400px] lg:h-[500px] object-cover"
               />

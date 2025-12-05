@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useContent } from "@/contexts/ContentContext";
 import riceField from "@/assets/rice-field.jpg";
 import paddyField from "@/assets/paddy-field.jpg";
 import tractor from "@/assets/tractor.jpg";
@@ -9,19 +10,25 @@ import dryingRice from "@/assets/drying-rice.jpg";
 import seedlings from "@/assets/seedlings.jpg";
 import plantain from "@/assets/plantain.jpg";
 
-const images = [
-  { src: riceField, alt: "Vue panoramique des rizières à Gagnoa" },
-  { src: paddyField, alt: "Champs de riz en croissance" },
-  { src: tractor, alt: "Travail des champs avec tracteur" },
-  { src: vegetables, alt: "Culture de légumes frais" },
-  { src: riceVarieties, alt: "Différentes variétés de riz" },
-  { src: dryingRice, alt: "Séchage du riz au soleil" },
-  { src: seedlings, alt: "Pépinière de plants" },
-  { src: plantain, alt: "Plants de bananiers" },
-];
+const defaultImages: Record<number, string> = {
+  1: riceField,
+  2: paddyField,
+  3: tractor,
+  4: vegetables,
+  5: riceVarieties,
+  6: dryingRice,
+  7: seedlings,
+  8: plantain,
+};
 
 const Gallery = () => {
+  const { content } = useContent();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const images = content.gallery.map((img) => ({
+    src: img.src || defaultImages[img.id] || riceField,
+    alt: img.alt,
+  }));
 
   const openLightbox = (index: number) => setSelectedIndex(index);
   const closeLightbox = () => setSelectedIndex(null);
