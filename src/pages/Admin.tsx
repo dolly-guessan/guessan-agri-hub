@@ -18,11 +18,14 @@ import {
   RefreshCw,
   Image,
   ImagePlus,
+  Video,
+  Youtube,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useContent, type Product, type FAQ, type Testimonial, type GalleryImage } from "@/contexts/ContentContext";
+import { useContent, type Product, type FAQ, type Testimonial, type GalleryImage, type Video as VideoType } from "@/contexts/ContentContext";
+import ImageUploader from "@/components/admin/ImageUploader";
 
-type Tab = "overview" | "hero" | "about" | "products" | "gallery" | "faq" | "testimonials" | "settings";
+type Tab = "overview" | "hero" | "about" | "products" | "gallery" | "videos" | "faq" | "testimonials" | "settings";
 
 const Admin = () => {
   const { toast } = useToast();
@@ -111,6 +114,27 @@ const Admin = () => {
     updateContent({ gallery: content.gallery.filter((img) => img.id !== id) });
   };
 
+  // Videos
+  const addVideo = () => {
+    const newVideo: VideoType = {
+      id: Date.now(),
+      youtubeUrl: "",
+      title: "Nouvelle vidéo",
+    };
+    updateContent({ videos: [...(content.videos || []), newVideo] });
+  };
+
+  const updateVideo = (id: number, field: keyof VideoType, value: string) => {
+    const updated = (content.videos || []).map((v) =>
+      v.id === id ? { ...v, [field]: value } : v
+    );
+    updateContent({ videos: updated });
+  };
+
+  const removeVideo = (id: number) => {
+    updateContent({ videos: (content.videos || []).filter((v) => v.id !== id) });
+  };
+
   // FAQ
   const addFaq = () => {
     const newFaq: FAQ = { question: "Nouvelle question ?", answer: "Réponse..." };
@@ -195,29 +219,11 @@ const Admin = () => {
     { id: "about" as Tab, label: "À propos", icon: FileText },
     { id: "products" as Tab, label: "Produits", icon: Package },
     { id: "gallery" as Tab, label: "Galerie", icon: Image },
+    { id: "videos" as Tab, label: "Vidéos", icon: Video },
     { id: "faq" as Tab, label: "FAQ", icon: HelpCircle },
     { id: "testimonials" as Tab, label: "Témoignages", icon: MessageSquare },
     { id: "settings" as Tab, label: "Paramètres", icon: Settings },
   ];
-
-  const ImageInput = ({ label, value, onChange, preview = true }: { label: string; value: string; onChange: (v: string) => void; preview?: boolean }) => (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-foreground">{label}</label>
-      <input
-        type="url"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="https://exemple.com/image.jpg"
-        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-      />
-      {preview && value && (
-        <div className="mt-2 relative aspect-video w-full max-w-xs rounded-lg overflow-hidden border border-border">
-          <img src={value} alt="Aperçu" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
-        </div>
-      )}
-      <p className="text-xs text-muted-foreground">Collez l'URL d'une image (hébergée en ligne)</p>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-muted">
@@ -295,7 +301,7 @@ const Admin = () => {
             {activeTab === "overview" && (
               <div>
                 <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Aperçu du site</h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                   <div className="p-6 rounded-xl bg-primary/10">
                     <Package className="w-8 h-8 text-primary mb-2" />
                     <p className="text-2xl font-bold text-foreground">{content.products.length}</p>
@@ -305,6 +311,11 @@ const Admin = () => {
                     <Image className="w-8 h-8 text-accent mb-2" />
                     <p className="text-2xl font-bold text-foreground">{content.gallery.length}</p>
                     <p className="text-sm text-muted-foreground">Images galerie</p>
+                  </div>
+                  <div className="p-6 rounded-xl bg-destructive/10">
+                    <Video className="w-8 h-8 text-destructive mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{(content.videos || []).length}</p>
+                    <p className="text-sm text-muted-foreground">Vidéos</p>
                   </div>
                   <div className="p-6 rounded-xl bg-secondary/10">
                     <HelpCircle className="w-8 h-8 text-secondary mb-2" />
@@ -323,7 +334,8 @@ const Admin = () => {
                     <li>• <strong>Hero</strong> : Modifiez le titre, slogan et image d'accueil</li>
                     <li>• <strong>À propos</strong> : Éditez votre présentation et photo</li>
                     <li>• <strong>Produits</strong> : Ajoutez/modifiez vos produits avec images</li>
-                    <li>• <strong>Galerie</strong> : Gérez les images de votre galerie</li>
+                    <li>• <strong>Galerie</strong> : Gérez les images (upload depuis votre appareil)</li>
+                    <li>• <strong>Vidéos</strong> : Ajoutez des vidéos YouTube/TikTok</li>
                     <li>• Cliquez sur "Sauvegarder" pour enregistrer vos modifications</li>
                   </ul>
                 </div>
@@ -362,7 +374,7 @@ const Admin = () => {
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
-                  <ImageInput
+                  <ImageUploader
                     label="Image d'arrière-plan Hero"
                     value={content.heroImage}
                     onChange={(v) => updateContent({ heroImage: v })}
@@ -416,7 +428,7 @@ const Admin = () => {
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
-                  <ImageInput
+                  <ImageUploader
                     label="Image À propos"
                     value={content.aboutImage}
                     onChange={(v) => updateContent({ aboutImage: v })}
@@ -484,21 +496,11 @@ const Admin = () => {
                           className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">Image du produit (URL)</label>
-                        <input
-                          type="url"
-                          value={product.image}
-                          onChange={(e) => updateProduct(product.id, "image", e.target.value)}
-                          placeholder="https://exemple.com/image.jpg"
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                        {product.image && (
-                          <div className="mt-2 w-32 h-24 rounded-lg overflow-hidden border border-border">
-                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
-                          </div>
-                        )}
-                      </div>
+                      <ImageUploader
+                        label="Image du produit"
+                        value={product.image}
+                        onChange={(v) => updateProduct(product.id, "image", v)}
+                      />
                     </div>
                   ))}
                 </div>
@@ -520,13 +522,13 @@ const Admin = () => {
                   </button>
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Ajoutez des URLs d'images pour votre galerie. Les images par défaut seront utilisées si l'URL est vide.
+                  Uploadez des images depuis votre appareil ou glissez-les directement dans la zone d'upload.
                 </p>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {content.gallery.map((image) => (
+                <div className="grid sm:grid-cols-2 gap-6">
+                  {content.gallery.map((image, index) => (
                     <div key={image.id} className="p-4 rounded-xl bg-muted/50 border border-border">
                       <div className="flex items-start justify-between mb-3">
-                        <span className="text-sm font-medium text-foreground">Image #{content.gallery.indexOf(image) + 1}</span>
+                        <span className="text-sm font-medium text-foreground">Image #{index + 1}</span>
                         <button
                           onClick={() => removeGalleryImage(image.id)}
                           className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
@@ -535,16 +537,11 @@ const Admin = () => {
                         </button>
                       </div>
                       <div className="space-y-3">
-                        <div>
-                          <label className="block text-xs text-muted-foreground mb-1">URL de l'image</label>
-                          <input
-                            type="url"
-                            value={image.src}
-                            onChange={(e) => updateGalleryImage(image.id, "src", e.target.value)}
-                            placeholder="https://exemple.com/image.jpg"
-                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                          />
-                        </div>
+                        <ImageUploader
+                          label="Image"
+                          value={image.src}
+                          onChange={(v) => updateGalleryImage(image.id, "src", v)}
+                        />
                         <div>
                           <label className="block text-xs text-muted-foreground mb-1">Description (alt)</label>
                           <input
@@ -555,14 +552,93 @@ const Admin = () => {
                             className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                           />
                         </div>
-                        {image.src && (
-                          <div className="w-full aspect-video rounded-lg overflow-hidden border border-border">
-                            <img src={image.src} alt={image.alt} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={handleSave} className="btn-hero mt-6">
+                  <Save className="w-5 h-5" />
+                  Sauvegarder
+                </button>
+              </div>
+            )}
+
+            {/* Videos Tab */}
+            {activeTab === "videos" && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des vidéos</h2>
+                  <button onClick={addVideo} className="btn-hero text-sm">
+                    <Plus className="w-4 h-4" />
+                    Ajouter une vidéo
+                  </button>
+                </div>
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Youtube className="w-6 h-6 text-destructive flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-1">Vidéos YouTube supportées</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Collez le lien de votre vidéo YouTube (formats acceptés: youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-6">
+                  {(content.videos || []).map((video) => (
+                    <div key={video.id} className="p-6 rounded-xl bg-muted/50 border border-border">
+                      <div className="flex items-start justify-between mb-4">
+                        <h3 className="font-semibold text-foreground">{video.title || "Sans titre"}</h3>
+                        <button
+                          onClick={() => removeVideo(video.id)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Supprimer
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">Titre de la vidéo</label>
+                          <input
+                            type="text"
+                            value={video.title}
+                            onChange={(e) => updateVideo(video.id, "title", e.target.value)}
+                            placeholder="Titre"
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-2">Lien YouTube</label>
+                          <input
+                            type="url"
+                            value={video.youtubeUrl}
+                            onChange={(e) => updateVideo(video.id, "youtubeUrl", e.target.value)}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                        {video.youtubeUrl && (
+                          <div className="aspect-video rounded-lg overflow-hidden border border-border bg-muted">
+                            <iframe
+                              src={`https://www.youtube.com/embed/${video.youtubeUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/)?.[1] || ""}`}
+                              title={video.title}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full h-full"
+                            />
                           </div>
                         )}
                       </div>
                     </div>
                   ))}
+                  {(content.videos || []).length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Video className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Aucune vidéo ajoutée</p>
+                      <p className="text-sm">Cliquez sur "Ajouter une vidéo" pour commencer</p>
+                    </div>
+                  )}
                 </div>
                 <button onClick={handleSave} className="btn-hero mt-6">
                   <Save className="w-5 h-5" />
@@ -739,11 +815,12 @@ const Admin = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Numéro WhatsApp (format: 2250787677108)</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Numéro WhatsApp (avec indicatif pays)</label>
                     <input
                       type="text"
                       value={content.whatsappNumber}
                       onChange={(e) => updateContent({ whatsappNumber: e.target.value })}
+                      placeholder="2250787677108"
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
