@@ -27,6 +27,12 @@ export interface GalleryImage {
   alt: string;
 }
 
+export interface Video {
+  id: number;
+  youtubeUrl: string;
+  title: string;
+}
+
 export interface SiteContent {
   heroTitle: string;
   heroSubtitle: string;
@@ -41,6 +47,7 @@ export interface SiteContent {
   faqs: FAQ[];
   testimonials: Testimonial[];
   gallery: GalleryImage[];
+  videos: Video[];
   seoTitle: string;
   seoDescription: string;
   contactPhone1: string;
@@ -91,6 +98,7 @@ const defaultContent: SiteContent = {
     { id: 7, src: "", alt: "Pépinière de plants" },
     { id: 8, src: "", alt: "Plants de bananiers" },
   ],
+  videos: [],
   seoTitle: "GUESSAN BI DOLI – Agriculteur à Gagnoa, Côte d'Ivoire",
   seoDescription: "Contactez GUESSAN BI DOLI, cultivateur passionné à Gagnoa, pour des fruits et légumes frais et de qualité.",
   contactPhone1: "0500216855",
