@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export interface Product {
   id: number;
@@ -130,6 +130,23 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     }
     return defaultContent;
   });
+
+  // Synchroniser les changements entre les onglets
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "site_content" && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setContent({ ...defaultContent, ...parsed });
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const updateContent = (newContent: Partial<SiteContent>) => {
     setContent((prev) => {
