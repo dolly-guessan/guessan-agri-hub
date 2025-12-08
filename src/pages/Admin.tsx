@@ -20,10 +20,43 @@ import {
   ImagePlus,
   Video,
   Youtube,
+  ImageIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useContent, type Product, type FAQ, type Testimonial, type GalleryImage, type Video as VideoType } from "@/contexts/ContentContext";
 import ImageUploader from "@/components/admin/ImageUploader";
+
+// Import default images for preview
+import heroFarmer from "@/assets/hero-farmer.jpg";
+import riceField from "@/assets/rice-field.jpg";
+import riceWhite from "@/assets/rice-white.jpg";
+import riceVarieties from "@/assets/rice-varieties.jpg";
+import vegetables from "@/assets/vegetables.jpg";
+import plantain from "@/assets/plantain.jpg";
+import seedlings from "@/assets/seedlings.jpg";
+import dryingRice from "@/assets/drying-rice.jpg";
+import paddyField from "@/assets/paddy-field.jpg";
+import tractor from "@/assets/tractor.jpg";
+
+const defaultProductImages: Record<number, string> = {
+  1: riceWhite,
+  2: riceVarieties,
+  3: vegetables,
+  4: plantain,
+  5: seedlings,
+  6: dryingRice,
+};
+
+const defaultGalleryImages: Record<number, string> = {
+  1: paddyField,
+  2: riceField,
+  3: tractor,
+  4: vegetables,
+  5: riceVarieties,
+  6: dryingRice,
+  7: seedlings,
+  8: plantain,
+};
 
 type Tab = "overview" | "hero" | "about" | "products" | "gallery" | "videos" | "faq" | "testimonials" | "settings";
 
@@ -301,6 +334,8 @@ const Admin = () => {
             {activeTab === "overview" && (
               <div>
                 <h2 className="text-2xl font-heading font-bold text-foreground mb-6">Aperçu du site</h2>
+                
+                {/* Stats */}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                   <div className="p-6 rounded-xl bg-primary/10">
                     <Package className="w-8 h-8 text-primary mb-2" />
@@ -328,6 +363,82 @@ const Admin = () => {
                     <p className="text-sm text-muted-foreground">Témoignages</p>
                   </div>
                 </div>
+
+                {/* Images Preview Section */}
+                <div className="space-y-6 mb-8">
+                  {/* Hero & About Images */}
+                  <div className="p-6 rounded-xl bg-muted/50 border border-border">
+                    <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <Home className="w-5 h-5 text-primary" />
+                      Images principales
+                    </h3>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Hero</p>
+                        <div className="aspect-video rounded-lg overflow-hidden border border-border bg-muted">
+                          <img
+                            src={content.heroImage || heroFarmer}
+                            alt="Image Hero"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">À propos</p>
+                        <div className="aspect-video rounded-lg overflow-hidden border border-border bg-muted">
+                          <img
+                            src={content.aboutImage || riceField}
+                            alt="Image À propos"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Products Images */}
+                  <div className="p-6 rounded-xl bg-muted/50 border border-border">
+                    <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <Package className="w-5 h-5 text-primary" />
+                      Images des produits ({content.products.length})
+                    </h3>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {content.products.map((product) => (
+                        <div key={product.id} className="space-y-1">
+                          <div className="aspect-square rounded-lg overflow-hidden border border-border bg-muted">
+                            <img
+                              src={product.image || defaultProductImages[product.id] || riceWhite}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">{product.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Gallery Images */}
+                  <div className="p-6 rounded-xl bg-muted/50 border border-border">
+                    <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <Image className="w-5 h-5 text-primary" />
+                      Images de la galerie ({content.gallery.length})
+                    </h3>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
+                      {content.gallery.map((image, index) => (
+                        <div key={image.id} className="aspect-square rounded-lg overflow-hidden border border-border bg-muted">
+                          <img
+                            src={image.src || defaultGalleryImages[index + 1] || paddyField}
+                            alt={image.alt}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Guide */}
                 <div className="p-6 rounded-xl bg-muted/50">
                   <h3 className="font-semibold text-foreground mb-2">Guide rapide</h3>
                   <ul className="text-sm text-muted-foreground space-y-2">
@@ -335,7 +446,7 @@ const Admin = () => {
                     <li>• <strong>À propos</strong> : Éditez votre présentation et photo</li>
                     <li>• <strong>Produits</strong> : Ajoutez/modifiez vos produits avec images</li>
                     <li>• <strong>Galerie</strong> : Gérez les images (upload depuis votre appareil)</li>
-                    <li>• <strong>Vidéos</strong> : Ajoutez des vidéos YouTube/TikTok</li>
+                    <li>• <strong>Vidéos</strong> : Ajoutez des vidéos YouTube</li>
                     <li>• Cliquez sur "Sauvegarder" pour enregistrer vos modifications</li>
                   </ul>
                 </div>
