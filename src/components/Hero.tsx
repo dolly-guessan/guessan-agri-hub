@@ -1,4 +1,4 @@
-import { ArrowDown, Phone, MessageCircle } from "lucide-react";
+import { Phone, MessageCircle } from "lucide-react";
 import heroFarmer from "@/assets/hero-farmer.jpg";
 import { useContent } from "@/contexts/ContentContext";
 
@@ -73,12 +73,6 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <a href="#apropos" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-            <ArrowDown className="w-8 h-8" />
-          </a>
-        </div>
       </div>
     </section>
   );
