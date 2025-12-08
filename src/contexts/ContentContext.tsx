@@ -122,7 +122,8 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     const saved = localStorage.getItem("site_content");
     if (saved) {
       try {
-        return { ...defaultContent, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        return { ...defaultContent, ...parsed };
       } catch {
         return defaultContent;
       }
@@ -131,7 +132,12 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const updateContent = (newContent: Partial<SiteContent>) => {
-    setContent((prev) => ({ ...prev, ...newContent }));
+    setContent((prev) => {
+      const updated = { ...prev, ...newContent };
+      // Sauvegarde automatique à chaque mise à jour
+      localStorage.setItem("site_content", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const saveContent = () => {
