@@ -6,9 +6,10 @@ interface ImageUploaderProps {
   value: string;
   onChange: (value: string) => void;
   preview?: boolean;
+  defaultImage?: string;
 }
 
-const ImageUploader = ({ label, value, onChange, preview = true }: ImageUploaderProps) => {
+const ImageUploader = ({ label, value, onChange, preview = true, defaultImage }: ImageUploaderProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,17 +51,53 @@ const ImageUploader = ({ label, value, onChange, preview = true }: ImageUploader
     }
   };
 
+  // Image à afficher (personnalisée ou par défaut)
+  const displayImage = value || defaultImage;
+  const hasCustomImage = !!value;
+
   return (
     <div className="space-y-3">
       <label className="block text-sm font-medium text-foreground">{label}</label>
       
+      {/* Miniature actuelle */}
+      {preview && displayImage && (
+        <div className="relative">
+          <div className="relative aspect-video w-full max-w-sm rounded-xl overflow-hidden border border-border bg-muted">
+            <img
+              src={displayImage}
+              alt="Aperçu"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+            {hasCustomImage && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemove();
+                }}
+                className="absolute top-2 right-2 p-1.5 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            {!hasCustomImage && defaultImage && (
+              <div className="absolute bottom-2 left-2 px-2 py-1 rounded-md bg-background/80 text-xs text-muted-foreground">
+                Image par défaut
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Upload Zone */}
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={() => fileInputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+        className={`relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all ${
           isDragging
             ? "border-primary bg-primary/5"
             : "border-border hover:border-primary/50 hover:bg-muted/50"
@@ -73,42 +110,21 @@ const ImageUploader = ({ label, value, onChange, preview = true }: ImageUploader
           onChange={handleInputChange}
           className="hidden"
         />
-        <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-        <p className="text-sm text-foreground font-medium">
-          Cliquez ou glissez une image ici
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          PNG, JPG, GIF jusqu'à 10MB
-        </p>
-      </div>
-
-      {/* Preview */}
-      {preview && value && (
-        <div className="relative">
-          <div className="relative aspect-video w-full max-w-sm rounded-xl overflow-hidden border border-border bg-muted">
-            <img
-              src={value}
-              alt="Aperçu"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemove();
-              }}
-              className="absolute top-2 right-2 p-1.5 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+        <div className="flex items-center justify-center gap-3">
+          <Upload className="w-5 h-5 text-muted-foreground" />
+          <div className="text-left">
+            <p className="text-sm text-foreground font-medium">
+              {hasCustomImage ? "Remplacer l'image" : "Uploader une image"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Cliquez ou glissez (PNG, JPG, GIF)
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Empty State */}
-      {!value && (
+      {/* Empty State - seulement si pas d'image du tout */}
+      {!displayImage && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <ImageIcon className="w-4 h-4" />
           <span>Aucune image sélectionnée</span>

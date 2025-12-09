@@ -498,6 +498,7 @@ const Admin = () => {
                     label="Image d'arrière-plan Hero"
                     value={content.heroImage}
                     onChange={(v) => updateContent({ heroImage: v })}
+                    defaultImage={heroFarmer}
                   />
                   <button onClick={handleSave} className="btn-hero">
                     <Save className="w-5 h-5" />
@@ -552,6 +553,7 @@ const Admin = () => {
                     label="Image À propos"
                     value={content.aboutImage}
                     onChange={(v) => updateContent({ aboutImage: v })}
+                    defaultImage={riceField}
                   />
                   <button onClick={handleSave} className="btn-hero">
                     <Save className="w-5 h-5" />
@@ -620,6 +622,7 @@ const Admin = () => {
                         label="Image du produit"
                         value={product.image}
                         onChange={(v) => updateProduct(product.id, "image", v)}
+                        defaultImage={defaultProductImages[product.id] || riceWhite}
                       />
                     </div>
                   ))}
@@ -661,6 +664,7 @@ const Admin = () => {
                           label="Image"
                           value={image.src}
                           onChange={(v) => updateGalleryImage(image.id, "src", v)}
+                          defaultImage={defaultGalleryImages[index + 1] || paddyField}
                         />
                         <div>
                           <label className="block text-xs text-muted-foreground mb-1">Description (alt)</label>
