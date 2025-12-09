@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Product {
   id: number;
@@ -113,61 +114,98 @@ interface ContentContextType {
   updateContent: (newContent: Partial<SiteContent>) => void;
   saveContent: () => void;
   resetContent: () => void;
+  isLoading: boolean;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 export const ContentProvider = ({ children }: { children: ReactNode }) => {
-  const [content, setContent] = useState<SiteContent>(() => {
-    const saved = localStorage.getItem("site_content");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return { ...defaultContent, ...parsed };
-      } catch {
-        return defaultContent;
-      }
-    }
-    return defaultContent;
-  });
+  const [content, setContent] = useState<SiteContent>(defaultContent);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Synchroniser les changements entre les onglets
+  // Charger le contenu depuis la base de données au démarrage
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "site_content" && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          setContent({ ...defaultContent, ...parsed });
-        } catch {
-          // Ignore parsing errors
+    const loadContent = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("site_content")
+          .select("content")
+          .eq("key", "main")
+          .maybeSingle();
+
+        if (error) {
+          console.error("Erreur lors du chargement du contenu:", error);
+        } else if (data?.content) {
+          setContent({ ...defaultContent, ...(data.content as Partial<SiteContent>) });
         }
+      } catch (err) {
+        console.error("Erreur:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    loadContent();
   }, []);
 
   const updateContent = (newContent: Partial<SiteContent>) => {
     setContent((prev) => {
       const updated = { ...prev, ...newContent };
-      // Sauvegarde automatique à chaque mise à jour
-      localStorage.setItem("site_content", JSON.stringify(updated));
       return updated;
     });
   };
 
-  const saveContent = () => {
-    localStorage.setItem("site_content", JSON.stringify(content));
+  const saveContent = async () => {
+    try {
+      const { data: existing } = await supabase
+        .from("site_content")
+        .select("id")
+        .eq("key", "main")
+        .maybeSingle();
+
+      if (existing) {
+        // Mise à jour
+        const { error } = await supabase
+          .from("site_content")
+          .update({ content: JSON.parse(JSON.stringify(content)) })
+          .eq("key", "main");
+
+        if (error) {
+          console.error("Erreur lors de la sauvegarde:", error);
+          throw error;
+        }
+      } else {
+        // Insertion
+        const { error } = await supabase
+          .from("site_content")
+          .insert([{ key: "main", content: JSON.parse(JSON.stringify(content)) }]);
+
+        if (error) {
+          console.error("Erreur lors de la création:", error);
+          throw error;
+        }
+      }
+      console.log("Contenu sauvegardé avec succès");
+    } catch (err) {
+      console.error("Erreur:", err);
+      throw err;
+    }
   };
 
-  const resetContent = () => {
+  const resetContent = async () => {
     setContent(defaultContent);
-    localStorage.removeItem("site_content");
+    try {
+      await supabase
+        .from("site_content")
+        .delete()
+        .eq("key", "main");
+    } catch (err) {
+      console.error("Erreur lors de la réinitialisation:", err);
+    }
   };
 
   return (
-    <ContentContext.Provider value={{ content, updateContent, saveContent, resetContent }}>
+    <ContentContext.Provider value={{ content, updateContent, saveContent, resetContent, isLoading }}>
       {children}
     </ContentContext.Provider>
   );
