@@ -91,9 +91,18 @@ const Admin = () => {
     toast({ title: "Déconnexion", description: "À bientôt !" });
   };
 
-  const handleSave = () => {
-    saveContent();
-    toast({ title: "Sauvegardé !", description: "Les modifications ont été enregistrées" });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveContent();
+      toast({ title: "Sauvegardé !", description: "Les modifications ont été enregistrées dans la base de données" });
+    } catch (error) {
+      toast({ title: "Erreur", description: "Impossible de sauvegarder les modifications", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReset = () => {
@@ -274,9 +283,9 @@ const Admin = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <button onClick={handleSave} className="btn-hero text-sm">
+            <button onClick={handleSave} className="btn-hero text-sm" disabled={isSaving}>
               <Save className="w-4 h-4" />
-              Sauvegarder
+              {isSaving ? "Sauvegarde..." : "Sauvegarder"}
             </button>
             <Link
               to="/"
