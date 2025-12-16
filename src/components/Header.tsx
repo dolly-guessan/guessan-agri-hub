@@ -1,4 +1,5 @@
-import { Phone, Mail, MapPin, Menu, X } from "lucide-react";
+import { Phone, Mail, MapPin, Menu, X, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
 const Header = () => {
@@ -60,6 +61,13 @@ const Header = () => {
             >
               WhatsApp
             </a>
+            <Link
+              to="/admin"
+              className="p-2 text-muted-foreground hover:text-primary transition-colors"
+              title="Administration"
+            >
+              <Settings className="w-5 h-5" />
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -102,6 +110,14 @@ const Header = () => {
                 >
                   Contacter sur WhatsApp
                 </a>
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Settings className="w-4 h-4" />
+                  Administration
+                </Link>
               </div>
             </div>
           </nav>
