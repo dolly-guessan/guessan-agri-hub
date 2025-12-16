@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Maximize2 } from "lucide-react";
 
 interface ImageUploaderProps {
   label: string;
@@ -11,6 +11,7 @@ interface ImageUploaderProps {
 
 const ImageUploader = ({ label, value, onChange, preview = true, defaultImage }: ImageUploaderProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (file: File) => {
@@ -71,17 +72,31 @@ const ImageUploader = ({ label, value, onChange, preview = true, defaultImage }:
                 e.currentTarget.style.display = "none";
               }}
             />
-            {hasCustomImage && (
+            {/* Boutons d'action */}
+            <div className="absolute top-2 right-2 flex gap-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRemove();
+                  setIsLightboxOpen(true);
                 }}
-                className="absolute top-2 right-2 p-1.5 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                className="p-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                title="Voir en grand"
               >
-                <X className="w-4 h-4" />
+                <Maximize2 className="w-4 h-4" />
               </button>
-            )}
+              {hasCustomImage && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemove();
+                  }}
+                  className="p-1.5 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                  title="Supprimer l'image"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
             {!hasCustomImage && defaultImage && (
               <div className="absolute bottom-2 left-2 px-2 py-1 rounded-md bg-background/80 text-xs text-muted-foreground">
                 Image par défaut
@@ -128,6 +143,27 @@ const ImageUploader = ({ label, value, onChange, preview = true, defaultImage }:
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <ImageIcon className="w-4 h-4" />
           <span>Aucune image sélectionnée</span>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {isLightboxOpen && displayImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setIsLightboxOpen(false)}
+            className="absolute top-4 right-4 p-2 text-white/80 hover:text-white transition-colors"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img
+            src={displayImage}
+            alt="Aperçu en grand"
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
