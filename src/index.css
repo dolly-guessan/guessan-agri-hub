@@ -139,6 +139,27 @@
     box-shadow: var(--shadow-harvest);
   }
 
+  .btn-admin {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200;
+    background: var(--gradient-earth);
+    color: hsl(var(--primary-foreground));
+  }
+
+  .btn-admin:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .btn-admin-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200;
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground));
+  }
+
+  .btn-admin-secondary:hover {
+    background: hsl(var(--muted-foreground) / 0.2);
+  }
+
   .btn-whatsapp {
     @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold transition-all duration-300;
     background: #25D366;
