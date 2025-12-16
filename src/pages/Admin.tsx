@@ -239,7 +239,7 @@ const Admin = () => {
                 placeholder="Entrez le mot de passe"
               />
             </div>
-            <button type="submit" className="btn-hero w-full justify-center">
+            <button type="submit" className="btn-admin w-full justify-center py-3">
               Se connecter
             </button>
           </form>
@@ -283,7 +283,7 @@ const Admin = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <button onClick={handleSave} className="btn-hero text-sm" disabled={isSaving}>
+            <button type="button" onClick={handleSave} className="btn-admin" disabled={isSaving}>
               <Save className="w-4 h-4" />
               {isSaving ? "Sauvegarde..." : "Sauvegarder"}
             </button>
@@ -500,7 +500,7 @@ const Admin = () => {
                     onChange={(v) => updateContent({ heroImage: v })}
                     defaultImage={heroFarmer}
                   />
-                  <button onClick={handleSave} className="btn-hero">
+                  <button type="button" onClick={handleSave} className="btn-admin">
                     <Save className="w-5 h-5" />
                     Sauvegarder
                   </button>
@@ -555,7 +555,7 @@ const Admin = () => {
                     onChange={(v) => updateContent({ aboutImage: v })}
                     defaultImage={riceField}
                   />
-                  <button onClick={handleSave} className="btn-hero">
+                  <button type="button" onClick={handleSave} className="btn-admin">
                     <Save className="w-5 h-5" />
                     Sauvegarder
                   </button>
@@ -568,7 +568,7 @@ const Admin = () => {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des produits</h2>
-                  <button onClick={addProduct} className="btn-hero text-sm">
+                  <button type="button" onClick={addProduct} className="btn-admin">
                     <Plus className="w-4 h-4" />
                     Ajouter
                   </button>
@@ -627,7 +627,7 @@ const Admin = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={handleSave} className="btn-hero mt-6">
+                <button type="button" onClick={handleSave} className="btn-admin mt-6">
                   <Save className="w-5 h-5" />
                   Sauvegarder
                 </button>
@@ -639,7 +639,7 @@ const Admin = () => {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-heading font-bold text-foreground">Gestion de la galerie</h2>
-                  <button onClick={addGalleryImage} className="btn-hero text-sm">
+                  <button type="button" onClick={addGalleryImage} className="btn-admin">
                     <ImagePlus className="w-4 h-4" />
                     Ajouter une image
                   </button>
@@ -680,7 +680,7 @@ const Admin = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={handleSave} className="btn-hero mt-6">
+                <button type="button" onClick={handleSave} className="btn-admin mt-6">
                   <Save className="w-5 h-5" />
                   Sauvegarder
                 </button>
@@ -692,7 +692,7 @@ const Admin = () => {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des vidéos</h2>
-                  <button onClick={addVideo} className="btn-hero text-sm">
+                  <button type="button" onClick={addVideo} className="btn-admin">
                     <Plus className="w-4 h-4" />
                     Ajouter une vidéo
                   </button>
@@ -764,7 +764,7 @@ const Admin = () => {
                     </div>
                   )}
                 </div>
-                <button onClick={handleSave} className="btn-hero mt-6">
+                <button type="button" onClick={handleSave} className="btn-admin mt-6">
                   <Save className="w-5 h-5" />
                   Sauvegarder
                 </button>
@@ -776,7 +776,7 @@ const Admin = () => {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des FAQ</h2>
-                  <button onClick={addFaq} className="btn-hero text-sm">
+                  <button type="button" onClick={addFaq} className="btn-admin">
                     <Plus className="w-4 h-4" />
                     Ajouter
                   </button>
@@ -809,7 +809,7 @@ const Admin = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={handleSave} className="btn-hero mt-6">
+                <button type="button" onClick={handleSave} className="btn-admin mt-6">
                   <Save className="w-5 h-5" />
                   Sauvegarder
                 </button>
@@ -821,7 +821,7 @@ const Admin = () => {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-heading font-bold text-foreground">Gestion des témoignages</h2>
-                  <button onClick={addTestimonial} className="btn-hero text-sm">
+                  <button type="button" onClick={addTestimonial} className="btn-admin">
                     <Plus className="w-4 h-4" />
                     Ajouter
                   </button>
@@ -872,7 +872,7 @@ const Admin = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={handleSave} className="btn-hero mt-6">
+                <button type="button" onClick={handleSave} className="btn-admin mt-6">
                   <Save className="w-5 h-5" />
                   Sauvegarder
                 </button>
@@ -957,7 +957,7 @@ const Admin = () => {
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
-                  <button onClick={handleSave} className="btn-hero">
+                  <button type="button" onClick={handleSave} className="btn-admin">
                     <Save className="w-5 h-5" />
                     Sauvegarder
                   </button>
