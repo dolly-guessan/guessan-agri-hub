@@ -122,6 +122,7 @@ const Admin = () => {
       image: "",
     };
     updateContent({ products: [...content.products, newProduct] });
+    toast({ title: "Produit ajouté", description: "Un nouveau produit a été ajouté" });
   };
 
   const updateProduct = (id: number, field: keyof Product, value: string) => {
@@ -143,6 +144,7 @@ const Admin = () => {
       alt: "Nouvelle image",
     };
     updateContent({ gallery: [...content.gallery, newImage] });
+    toast({ title: "Image ajoutée", description: "Une nouvelle image a été ajoutée à la galerie" });
   };
 
   const updateGalleryImage = (id: number, field: keyof GalleryImage, value: string) => {
@@ -164,6 +166,7 @@ const Admin = () => {
       title: "Nouvelle vidéo",
     };
     updateContent({ videos: [...(content.videos || []), newVideo] });
+    toast({ title: "Vidéo ajoutée", description: "Une nouvelle vidéo a été ajoutée" });
   };
 
   const updateVideo = (id: number, field: keyof VideoType, value: string) => {
@@ -181,6 +184,7 @@ const Admin = () => {
   const addFaq = () => {
     const newFaq: FAQ = { question: "Nouvelle question ?", answer: "Réponse..." };
     updateContent({ faqs: [...content.faqs, newFaq] });
+    toast({ title: "FAQ ajoutée", description: "Une nouvelle question a été ajoutée" });
   };
 
   const updateFaq = (index: number, field: keyof FAQ, value: string) => {
@@ -203,6 +207,7 @@ const Admin = () => {
       rating: 5,
     };
     updateContent({ testimonials: [...content.testimonials, newTestimonial] });
+    toast({ title: "Témoignage ajouté", description: "Un nouveau témoignage a été ajouté" });
   };
 
   const updateTestimonial = (id: number, field: keyof Testimonial, value: string | number) => {

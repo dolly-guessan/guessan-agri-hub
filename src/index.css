@@ -140,7 +140,7 @@
   }
 
   .btn-admin {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 cursor-pointer;
     background: var(--gradient-earth);
     color: hsl(var(--primary-foreground));
   }
@@ -148,6 +148,10 @@
   .btn-admin:hover {
     opacity: 0.9;
     transform: translateY(-1px);
+  }
+
+  .btn-admin:active {
+    transform: translateY(0);
   }
 
   .btn-admin-secondary {
